@@ -1,1 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Voice Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<div class="app">
+
+  <div class="sidebar">
+    <h2>语音房间</h2>
+
+    <input id="username" placeholder="昵称">
+    <input id="roomId" placeholder="房间号">
+
+    <button onclick="joinRoom()">加入房间</button>
+
+    <div class="users">
+      <h3>在线用户</h3>
+      <ul id="userList"></ul>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div class="topbar">
+      <span id="status">未连接</span>
+    </div>
+
+    <div class="chat-box" id="chatBox"></div>
+
+    <div class="chat-input">
+      <input id="messageInput" placeholder="输入消息">
+      <button onclick="sendMessage()">发送</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
