@@ -1,46 +1,152 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Voice Chat</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice Chat</title>
+
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
+<style>
+body{
+  background:#0f172a;
+  color:white;
+  font-family:sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.box{
+  width:320px;
+  background:#1e293b;
+  padding:20px;
+  border-radius:20px;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  background:#3b82f6;
+  color:white;
+}
+
+#users{
+  margin-top:20px;
+}
+
+.user{
+  background:#0f172a;
+  padding:10px;
+  border-radius:10px;
+  margin-top:5px;
+}
+</style>
 </head>
 <body>
 
-<div class="app">
+<div class="box">
 
-  <div class="sidebar">
-    <h2>语音房间</h2>
+<h2>实时语音聊天室</h2>
 
-    <input id="username" placeholder="昵称">
-    <input id="roomId" placeholder="房间号">
+<input id="myId" placeholder="你的ID">
 
-    <button onclick="joinRoom()">加入房间</button>
+<input id="targetId" placeholder="对方ID">
 
-    <div class="users">
-      <h3>在线用户</h3>
-      <ul id="userList"></ul>
-    </div>
-  </div>
+<button onclick="start()">启动</button>
 
-  <div class="main">
+<button onclick="callUser()">拨打语音</button>
 
-    <div class="topbar">
-      <span id="status">未连接</span>
-    </div>
-
-    <div class="chat-box" id="chatBox"></div>
-
-    <div class="chat-input">
-      <input id="messageInput" placeholder="输入消息">
-      <button onclick="sendMessage()">发送</button>
-    </div>
-
-  </div>
+<div id="users"></div>
 
 </div>
 
-<script src="app.js"></script>
+<script>
+
+let peer;
+let localStream;
+
+async function start(){
+
+  const myId = document.getElementById("myId").value;
+
+  localStream = await navigator.mediaDevices.getUserMedia({
+    audio:true
+  });
+
+  peer = new Peer(myId);
+
+  peer.on("open",id=>{
+
+    addUser("你的ID: "+id);
+
+  });
+
+  peer.on("call",call=>{
+
+    call.answer(localStream);
+
+    call.on("stream",remoteStream=>{
+
+      const audio = new Audio();
+
+      audio.srcObject = remoteStream;
+
+      audio.play();
+
+      addUser("已连接");
+
+    });
+
+  });
+
+}
+
+function callUser(){
+
+  const targetId = document.getElementById("targetId").value;
+
+  const call = peer.call(targetId,localStream);
+
+  call.on("stream",remoteStream=>{
+
+    const audio = new Audio();
+
+    audio.srcObject = remoteStream;
+
+    audio.play();
+
+    addUser("通话中");
+
+  });
+
+}
+
+function addUser(text){
+
+  const div = document.createElement("div");
+
+  div.className = "user";
+
+  div.innerText = text;
+
+  document.getElementById("users").appendChild(div);
+
+}
+
+</script>
+
 </body>
 </html>
